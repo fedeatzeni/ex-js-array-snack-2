@@ -71,12 +71,15 @@ const availableBooks = books.filter(book => book.available === true);
 
 // Crea un array (discountedBooks) con gli availableBooks, ciascuno con il prezzo scontato del 20%
 // (mantieni lo stesso formato e arrotonda al centesimo)
-const discountedBooks = availableBooks.map(book => ({ ...book, price: parseFloat(book.price) - (parseFloat(book.price) * 20 / 100).toFixed(2) + "€" }));
+const discountedBooks = availableBooks.map(book => {
+    const price = (parseFloat(book.price) * 0.8).toFixed(2) + "€"
+    return { ...book, price: price }
+});
 // console.log(discountedBooks);
 
 
 // Salva in una variabile (fullPricedBook) il primo elemento di discountedBooks che ha un prezzo intero (senza centesimi).
-const fullPricedBook = discountedBooks.find(book => book.price.split(".").length === 1);
+const fullPricedBook = discountedBooks.find(book => parseFloat(book.price) % 1 === 0);
 // console.log(fullPricedBook);
 
 
@@ -131,9 +134,9 @@ const fetchJson = async (url) => {
     return obj;
 }
 
-const getBooks = (list) => {
+const getBooks = async (list) => {
     const promises = list.map(id => fetchJson(`${url}${id}`))
-    return Promise.all(promises)
+    return await Promise.all(promises)
 }
 
 // getBooks([2, 13, 7, 21, 19])
@@ -161,3 +164,15 @@ booksByPrice.sort((a, b) => b.available - a.available)
 // Snack 7 (Bonus) - Analizza i tag
 
 // Usa reduce per creare un oggetto (tagCounts) che conta quante volte ogni tag viene usato tra i libri.
+
+// visto da correzzione 
+const tagCounts = books.reduce((acc, b) => {
+    b.tags.forEach(tag => {
+        if (!acc[tag]) {
+            acc[tag] = 0
+        }
+        acc[tag]++;
+    })
+    return acc;
+}, {});
+console.log(tagCounts);
